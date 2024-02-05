@@ -13,6 +13,9 @@ import {
     FrameResult,
 } from './states';
 
+
+import { QBusinessClient, ListApplicationsCommand } from '@aws-sdk/client-qbusiness';
+
 export class InvalidStateException {}
 
 export abstract class BasePetType implements IPetType {
@@ -189,8 +192,29 @@ export abstract class BasePetType implements IPetType {
         return !isStateAboveGround(this.currentStateEnum) && this.isMoving;
     }
 
+    createCodeWhispererClient() {
+        console.log("calling");
+        var cwClient = new QBusinessClient({region: "us-east-1"});
+        const input = { // ExportResultArchiveRequest
+               maxRsults: 1, // required
+               nextToken: "1", // required
+             };
+        const command = new ListApplicationsCommand(input);
+        // async/await.
+        try {
+            cwClient.send(command).then((data) => {
+                console.log("sent");
+                console.log(data);
+            });
+            // process data.
+        } catch (error) {
+            // error handling.
+        }
+            }
+
     showSpeechBubble(message: string, duration: number = 3000) {
-        this.speech.innerHTML = message;
+        this.createCodeWhispererClient();
+        this.speech.innerHTML = "";
         this.speech.style.display = 'block';
         setTimeout(() => {
             this.hideSpeechBubble();
