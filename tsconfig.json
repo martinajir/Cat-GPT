@@ -4,6 +4,7 @@
         "strictNullChecks": true,
         "outDir": "./.build-out",
         "lib": ["es2016", "dom"],
+        "moduleResolution":"node",
         "target": "esnext"
     },
     "include": ["src"]
