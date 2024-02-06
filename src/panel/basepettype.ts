@@ -200,19 +200,12 @@ export abstract class BasePetType implements IPetType {
         var config = {
             region: "us-east-1",
             endpoint: "https://codewhisperer.us-east-1.amazonaws.com/",
-            credentials: {
-                accessKeyId: "INSERT-SECRET-KEY",
-                secretAccessKey: "INSERT-SECRET-ACCESS-KEY"
-            },
             token: {token: bearerToken}
         }
         var cwClient = new CodeWhispererStreaming(config);
-       // const command = new GenerateAssistantResponseCommand(input);
+
         // async/await.
-
-         const input = {"conversationState":{"currentMessage":{"userInputMessage":{"content":"Explain selected code","userInputMessageContext":{"editorState":{}},"userIntent":"EXPLAIN_CODE_SELECTION"}},"chatTriggerType":"MANUAL"}}
-
-         const command = new GenerateAssistantResponseCommand(input);
+        const input = {"conversationState":{"currentMessage":{"userInputMessage":{"content":"Explain selected code","userInputMessageContext":{"editorState":{}},"userIntent":"EXPLAIN_CODE_SELECTION"}},"chatTriggerType":"MANUAL"}}
 
         var charResponse = 
         cwClient.generateAssistantResponse(input).then(async (data : GenerateAssistantResponseCommandOutput ) => 
@@ -238,7 +231,7 @@ export abstract class BasePetType implements IPetType {
     }
 
     showSpeechBubble(message: string, duration: number = 6000) {
-        var cwMessage = this.callCodeWhispererClient().then((value) => {
+        this.callCodeWhispererClient().then((value) => {
             this.speech.innerHTML = value;
         })
         this.speech.style.display = 'block';

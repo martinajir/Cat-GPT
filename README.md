@@ -1,5 +1,30 @@
 <div align='center'>
 
+
+# HOW TO RUN
+
+**Note: The below setup is very convoluted as this was done as a proof of concept, but capturing this for auditability**
+
+### Setting up AWS toolkit locally
+
+Steps:
+1. Clone [aws-toolkit-vscode](https://github.com/aws/aws-toolkit-vscode) from Github
+2. [TEMPORARY] Change to commit `819e63` as this has the `generateClients` script that is needed
+3. Run `npm install`
+4. Run `npm run generateClients`
+5. Modify `featureDev.ts` to log on console the bearer token used (for local runs only, do NOT store this)
+6. Run the VS code extension and trigger the codewhisperer client by starting Amazon Q chat
+7. Retrieve bearer token from developer tools console
+
+### Setting up Cat-GPT
+1. Edit `callCodeWhispererClient()` in `basepettype.ts` to use the bearer token retrieved above
+2. Copy the codewhisperer client to this package via `cp -r <PATH_TO_TOOLKIT>/aws-toolkit-vscode/src.gen/@amzn ./node_modules/`
+3. Run `npm install <PATH_TO_TOOLKIT>/aws-toolkit-vscode/src.gen/@amzn/codewhisperer-streaming --save --no-audit`
+4. Run `npm run compile`
+5. Run the VS code extension and open developer tools console
+6. Try hovering over the pets - this should call codewhisperer streaming client and have them say something!
+
+
 # VS Code Pets
 
 ![icon](https://github.com/tonybaloney/vscode-pets/raw/master/icon.png)
