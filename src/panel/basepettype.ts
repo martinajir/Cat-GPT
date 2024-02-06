@@ -12,6 +12,8 @@ import {
     HorizontalDirection,
     FrameResult,
 } from './states';
+import { CodeWhispererStreaming, GenerateAssistantResponseCommand, GenerateTaskAssistPlanCommand, GenerateAssistantResponseCommandOutput} from "@amzn/codewhisperer-streaming";
+import { ExportResultArchiveCommand } from "@amzn/codewhisperer-streaming";
 
 
 import { QBusinessClient, ListApplicationsCommand } from '@aws-sdk/client-qbusiness';
@@ -192,30 +194,57 @@ export abstract class BasePetType implements IPetType {
         return !isStateAboveGround(this.currentStateEnum) && this.isMoving;
     }
 
-    createCodeWhispererClient() {
+    callCodeWhispererClient() {
         console.log("calling");
-        var cwClient = new QBusinessClient({region: "us-east-1"});
-        const input = { // ExportResultArchiveRequest
-               maxRsults: 1, // required
-               nextToken: "1", // required
-             };
-        const command = new ListApplicationsCommand(input);
-        // async/await.
-        try {
-            cwClient.send(command).then((data) => {
-                console.log("sent");
-                console.log(data);
-            });
-            // process data.
-        } catch (error) {
-            // error handling.
+        const bearerToken = "INSERT-BEARER-TOKEN"
+        var config = {
+            region: "us-east-1",
+            endpoint: "https://codewhisperer.us-east-1.amazonaws.com/",
+            credentials: {
+                accessKeyId: "INSERT-SECRET-KEY",
+                secretAccessKey: "INSERT-SECRET-ACCESS-KEY"
+            },
+            token: {token: bearerToken}
         }
-            }
+        var cwClient = new CodeWhispererStreaming(config);
+       // const command = new GenerateAssistantResponseCommand(input);
+        // async/await.
 
-    showSpeechBubble(message: string, duration: number = 3000) {
-        this.createCodeWhispererClient();
-        this.speech.innerHTML = "";
+         const input = {"conversationState":{"currentMessage":{"userInputMessage":{"content":"Explain selected code","userInputMessageContext":{"editorState":{}},"userIntent":"EXPLAIN_CODE_SELECTION"}},"chatTriggerType":"MANUAL"}}
+
+         const command = new GenerateAssistantResponseCommand(input);
+
+        var charResponse = 
+        cwClient.generateAssistantResponse(input).then(async (data : GenerateAssistantResponseCommandOutput ) => 
+            {
+            console.log("sent");
+            console.log("stringified data " + JSON.stringify(data));
+            var allChatEvents = ''
+            for await (const chatEvent of data.generateAssistantResponseResponse!) {
+                console.log("stringified chat event " + JSON.stringify(chatEvent))
+                if (
+                    chatEvent.assistantResponseEvent?.content !== undefined &&
+                    chatEvent.assistantResponseEvent.content.length > 0
+                ) {
+                    allChatEvents += chatEvent.assistantResponseEvent.content
+                }
+            }
+            return allChatEvents
+        })
+        charResponse.then((value) => {
+            console.log("All responses: " + JSON.stringify(value))
+        })
+        return charResponse
+    }
+
+    showSpeechBubble(message: string, duration: number = 6000) {
+        var cwMessage = this.callCodeWhispererClient().then((value) => {
+            this.speech.innerHTML = value;
+        })
         this.speech.style.display = 'block';
+        this.speech.style.fontSize = '8pt';
+        this.speech.style.width = '250px';
+        this.speech.style.height = '250px';
         setTimeout(() => {
             this.hideSpeechBubble();
         }, duration);

@@ -277,6 +277,7 @@
         "webpack-cli": "^4.10.0"
     },
     "dependencies": {
+        "@amzn/codewhisperer-streaming": "file:../../aws-toolkit-vscode/src.gen/@amzn/codewhisperer-streaming",
         "@vscode/l10n": "^0.0.10",
         "aws-sdk": "^2.1550.0"
     }

@@ -874,7 +874,7 @@ class PetWebviewContainer implements IPetPanel {
 					Use a content security policy to only allow loading images from https or from our extension directory,
 					and only allow scripts that have a specific nonce.
 				-->
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none' https://codewhisperer.us-east-1.amazonaws.com/; style-src ${
                     webview.cspSource
                 } 'nonce-${nonce}'; img-src ${
             webview.cspSource
